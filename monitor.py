@@ -2,7 +2,10 @@ import os
 import subprocess
 import re
 import datetime
+import time
+from gpiozero import LED
 
+relay = LED(23)
 
 def pingTest(hostName):
     # response = os.system("ping " + hostName)
@@ -28,12 +31,21 @@ def pingTestandLog(hostName, logfile, additionalMessage = ""):
             os.mkdir("log")
         
         logFile.write(str(time) + ": Ping failed to "+hostName+  " "+ additionalMessage +"\n")
+    else:
+        logFile.write(str(time) + ": Ping successful "+hostName+  " "+ additionalMessage +"\n")
 
     return results
+def resetInternet():
+    print("Turning off relay")
+    relay.on()
+    time.sleep(30)
+    print("Turning on relay")
+    relay.off()
+
 
 if __name__ == "__main__":
-    logFile = open("log/outage.log",'a')
-    test_hosts = ["192.168.0.0","192.168.0.0"]
+    logFile = open("/home/pi/bin/internet_monitor/log/outage.log",'a')
+    test_hosts = ["8.8.8.8","8.8.4.4"]
 
     failureCount = 0
     internet_recovered = False
@@ -42,6 +54,7 @@ if __name__ == "__main__":
         for host in test_hosts:
             if not pingTestandLog(host, logFile):
                 log_results += 1
+                internet_recovered = False
         
 
         if log_results == len(test_hosts):
@@ -53,12 +66,15 @@ if __name__ == "__main__":
         else:
             break
 
-        # reset the router
-        if failureCount >= 4:
+        # reset the routerS
+        if failureCount == 4:
             logFile.write(str(datetime.datetime.now()) + ": Resting internet. "+"\n")
             # if router Reset function:
-                # internet_recovered = True
-            pass
+            internet_recovered = True
+            resetInternet()
+        if failureCount < 5:
+            time.sleep(300)
+            
         
     if failureCount > 0 and internet_recovered:
         logFile.write(str(datetime.datetime.now()) + ": Internet was restored. "+"\n")
