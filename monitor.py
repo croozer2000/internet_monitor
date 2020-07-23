@@ -16,7 +16,7 @@ def pingTest(hostName):
     match = r"(\d*)% packet loss"
     match2 = r"unreachable"
     
-    # print(response.decode())
+    print(response.decode())
     m = int(re.search(match,response.decode()).group(1))
     # print(m)
     if m > 0:
@@ -33,6 +33,7 @@ def pingTestandLog(hostName, logfile, additionalMessage = ""):
         logFile.write(str(time) + ": Ping failed to "+hostName+  " "+ additionalMessage +"\n")
     else:
         logFile.write(str(time) + ": Ping successful "+hostName+  " "+ additionalMessage +"\n")
+        # pass
 
     return results
 def resetInternet():
@@ -44,7 +45,7 @@ def resetInternet():
 
 
 if __name__ == "__main__":
-    logFile = open("/home/pi/bin/internet_monitor/log/outage.log",'a')
+    logFile = open("/home/pi/bin/internet_monitor/log/"+datetime.datetime.now().strftime("%Y-%m-%d")+"_outage.log",'a')
     test_hosts = ["8.8.8.8","8.8.4.4"]
 
     failureCount = 0
