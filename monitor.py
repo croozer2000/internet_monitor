@@ -45,7 +45,8 @@ def resetInternet():
 
 
 if __name__ == "__main__":
-    logFile = open("/home/pi/bin/internet_monitor/log/"+datetime.datetime.now().strftime("%Y-%m-%d")+"_outage.log",'a')
+    FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)),"log/"+datetime.datetime.now().strftime("%Y-%m-%d")+"_outage.log")
+    logFile = open(FILENAME,'a')
     test_hosts = ["8.8.8.8","8.8.4.4"]
 
     failureCount = 0
